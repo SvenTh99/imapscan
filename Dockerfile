@@ -15,47 +15,53 @@ RUN apt-get update && \
       cron \
       imapfilter \
       nano \
-      python \
-      python-pip \
-      python-setuptools \
+      python3 \
+      python3-pip \
+      python3-setuptools \
       pyzor \
       razor \
       rsyslog \
+      systemctl \
       spamassassin \
       spamc \
       unzip \
       wget \
+      pipx \
+      python3-wheel \
+      python3-docopt \
     && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    /usr/bin/env python -m pip install wheel && \
-    /usr/bin/env python -m pip install docopt==0.6.2
+    rm -rf /var/lib/apt/lists/*  
+    # /usr/bin/env python3 -m pipx install wheel && \
+    # /usr/bin/env python3 -m pipx install docopt==0.6.2
 
 WORKDIR /root
 
 # install isbg
-RUN wget https://github.com/dc55028/isbg/archive/master.zip && \
+ RUN wget https://github.com/dc55028/isbg/archive/master.zip && \
     mv master.zip isbg.zip && \
     unzip isbg.zip && \
     cd isbg-master && \
-    python setup.py install && \
+    python3 setup.py install && \
     cd .. && \
     rm -Rf isbg-master && \
     rm isbg.zip
 
-ADD files/* /root/
+ ADD files/* /root/
+
+# COPY files/* /root/
 
 # prepare directories and files
-RUN mkdir /root/accounts ; \
+ RUN mkdir /root/accounts ; \
     mkdir /root/.imapfilter ; \
     mkdir -p /var/spamassassin/bayesdb ; \
     chown -R debian-spamd:mail /var/spamassassin ; \
     chmod u+x startup ; \
     chmod u+x *.sh ; \
     crontab cron_scans && rm cron_scans ; \
-    sed -i 's/ENABLED=0/ENABLED=1/' /etc/default/spamassassin ; \
-    sed -i 's/CRON=0/CRON=1/' /etc/default/spamassassin ; \
-    sed -i 's/^OPTIONS=".*"/OPTIONS="--allow-tell --max-children 5 --helper-home-dir -u debian-spamd -x --virtual-config-dir=\/var\/spamassassin -s mail"/' /etc/default/spamassassin ; \
+    sed -i 's/ENABLED=0/ENABLED=1/' /etc/mail/spamassassin ; \
+    sed -i 's/CRON=0/CRON=1/' /etc/mail/spamassassin ; \
+    sed -i 's/^OPTIONS=".*"/OPTIONS="--allow-tell --max-children 5 --helper-home-dir -u debian-spamd -x --virtual-config-dir=\/var\/spamassassin -s mail"/' /etc/mail/spamassassin ; \
     echo "bayes_path /var/spamassassin/bayesdb/bayes" >> /etc/spamassassin/local.cf ; \
     echo "allow_user_rules 1" >> /etc/spamassassin/local.cf ; \
     mv 9*.cf /etc/spamassassin/ ; \
