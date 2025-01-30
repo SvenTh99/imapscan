@@ -44,7 +44,8 @@ fi
 
 # start services, etc...
 echo "starting services"
-service rsyslog start
+# service rsyslog start
+systemctl start rsyslog
 
 {
   echo "fixing permissions, just in case..."
@@ -56,11 +57,13 @@ service rsyslog start
   sa-learn --force-expire
 
   logger "starting spamassassin"
-  service spamassassin start
+  # service spamassassin start
+systemctl start spamassassin
 
   echo "running learm_spam"
   ./learn_spam.sh
 
   echo "starting CRON"
-  service cron start
+  # service cron start
+systemctl start cron
 } | /usr/bin/logger -e -s -t startup
