@@ -44,7 +44,11 @@ fi
 
 # start services, etc...
 echo "starting services"
-service rsyslog start
+#service is the old way, use systemctl start
+
+# service rsyslog start
+
+systemctl start rsyslog
 
 {
   echo "fixing permissions, just in case..."
